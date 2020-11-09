@@ -6,6 +6,7 @@ function rateControl(options) {
   }
   options = options || {};
   options.onBlocked = typeof options.onBlocked === 'function' ? options.onBlocked : (_req, res) => res.sendStatus(429);
+  options.identifier = typeof options.identifier === 'function' ? options.identifier : req => req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   options.requestsPerMinute = options.requestsPerMinute || 60;
 
   // Setup mutex
@@ -40,7 +41,7 @@ function rateControl(options) {
 
   return function rateControl(req, res, next) {
     mutex.acquire().then(async function (release) {
-      var ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+      var ip = options.identifier(req);
       var currentRequest;
 
       /* Search for entry */

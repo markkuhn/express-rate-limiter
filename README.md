@@ -22,6 +22,9 @@ var rateLimiter = require('@markkuhn/express-rate-limiter');
 
 app.use(rateLimiter({
     requestsPerMinute: 100,
+    identifier: function(req) {
+        return req.headers['x-forwarded-to'];
+    },
     onBlocked: function(req, res) {
         res.sendStatus(429);
         console.log('Too many requests');
@@ -35,9 +38,11 @@ app.use(rateLimiter({
 rateLimiter(options)
 ```
 
- - `requestsPerMinute` : `Number` amount of requests allowed per minute
+ - `requestsPerMinute` : `Number` amount of requests allowed per minute (default: `60`).
 
- - `onBlocked` : `Function` called when limit has been reached.
+ - `identifier` : `Function` returns an identifier for a request (default: `req.headers['x-forwarded-to'] || req.connection.remoteAddress`).
+
+ - `onBlocked` : `Function` called when limit has been reached (default: `res.sendStatus(429)`).
 
 [license-shield]: https://img.shields.io/github/license/markkuhn/mongoose-express-rate-limiter.svg?style=flat-square
 [license-url]: https://github.com/markkuhn/mongoose-express-rate-limiter/blob/main/LICENSE
