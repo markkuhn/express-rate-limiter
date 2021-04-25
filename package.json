@@ -1,6 +1,6 @@
 {
   "name": "@markkuhn/express-rate-limiter",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Express rate limiter for apps using mongoose",
   "main": "index.js",
   "scripts": {
@@ -23,6 +23,6 @@
   },
   "homepage": "https://github.com/markkuhn/express-rate-control",
   "dependencies": {
-    "async-mutex": "^0.2.4"
+    "async-mutex": "^0.2.6"
   }
 }
