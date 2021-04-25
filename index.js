@@ -19,34 +19,35 @@ function rateControl(options) {
     identifier: {
       type: String,
       unique: true,
-      required: true
+      required: true,
     },
     tokens: {
       type: Number,
       default: options.requestsPerMinute - 1,
       min: 0,
-      required: true
+      required: true,
     },
     timeStamps: {
       type: [Date],
       required: true,
-      default: [Date.now()]
+      default: [Date.now()],
     },
+    createdAt: { type: Date, required: true, default: Date.now },
   });
   requestEntrySchema.index({ createdAt: 1 }, { expireAfterSeconds: 600 });
-  var requestEntry = mongoose.model('RequestEntry', requestEntrySchema);
-  requestEntry.deleteMany({}, err => {
+  const RequestEntry = mongoose.model('RequestEntry', requestEntrySchema);
+  RequestEntry.deleteMany({}, err => {
     if (err) console.error(err);
   });
 
   return function rateControl(req, res, next) {
     mutex.acquire().then(async function (release) {
-      var ip = options.identifier(req);
-      var currentRequest;
+      let ip = options.identifier(req);
+      let currentRequest;
 
       /* Search for entry */
       try {
-        currentRequest = await requestEntry.findOne({ identifier: ip });
+        currentRequest = await RequestEntry.findOne({ identifier: ip });
       } catch (err) {
         release();
         console.error(err);
@@ -56,7 +57,7 @@ function rateControl(options) {
       /* Create new entry */
       if (!currentRequest) {
         try {
-          await requestEntry.create({ identifier: ip });
+          await RequestEntry.create({ identifier: ip });
         } catch (err) {
           console.error(err);
           return res.sendStatus(500);
